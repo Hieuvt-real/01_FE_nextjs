@@ -6,7 +6,7 @@ import FooterAdmin from "@/components/layoutAdmin/FooterAdmin";
 import HeaderAdmin from "@/components/layoutAdmin/HeaderAdmin";
 import SidebarAdmin from "@/components/layoutAdmin/SidebarAdmin";
 import ContentAdmin from "@/components/layoutAdmin/ContentAdmin";
-
+// todo: custom lại layout
 const AdminLayout = ({
   children,
 }: Readonly<{

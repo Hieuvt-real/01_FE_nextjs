@@ -1,0 +1,51 @@
+@import './base';
+
+.activate-container {
+    @extend .auth-container;
+    background-color: transparent; 
+    text-align: center;
+    padding: 12px 24px;
+    width: 100%;
+    border: none;
+}
+
+.subtitle {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.code-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.code-inputs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.code-input {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    font-size: 18px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+
+    &:focus {
+        border-color: $primary-color;
+    }
+}
+
+.activate-btn {
+    @extend .btn;
+    background-color: $primary-color;
+
+    &:hover {
+        background-color: darken($primary-color, 10%);
+    }
+}

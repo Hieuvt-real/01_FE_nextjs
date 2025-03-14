@@ -1,0 +1,11 @@
+@import './base';
+
+.login-container {
+  @extend .auth-container;
+  background-color: #f9f9f9;
+}
+
+.login-btn {
+  @extend .btn;
+  background-color: darken($primary-color, 10%);
+}
