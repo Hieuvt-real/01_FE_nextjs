@@ -15,10 +15,12 @@ type FieldType = {
 
 const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
   console.log("Success:", values);
-  const { username, password } = values;
+  const { username: email, password } = values;
   // trigger sign in
-  if (username && password) {
-    const res = await authenticate(username, password);
+  if (email && password) {
+    // console.log("process.env.BASE_URL", process.env.NEXT_PUBLIC_API_URL);
+
+    const res = await authenticate(email, password);
     console.log(">>>>>> check res", res);
   }
 };

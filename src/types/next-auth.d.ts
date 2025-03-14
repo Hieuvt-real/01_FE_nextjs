@@ -1,5 +1,6 @@
-// import NextAuth, { DefaultSession } from "next-auth";
-// import { JWT } from "next-auth/jwt";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import NextAuth, { DefaultSession } from "next-auth";
+import { JWT } from "next-auth/jwt";
 
 interface IUser {
   _id: string;
