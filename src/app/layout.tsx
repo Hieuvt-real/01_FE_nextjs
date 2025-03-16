@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
+import NextAuthWrapper from "./utils/next.auth.wrapper";
 
 export const metadata: Metadata = {
   title: "Home",
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AntdRegistry>{children}</AntdRegistry>
+        <AntdRegistry>
+          <NextAuthWrapper>{children}</NextAuthWrapper>
+        </AntdRegistry>
       </body>
     </html>
   );

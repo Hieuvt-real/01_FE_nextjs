@@ -6,17 +6,20 @@ import FooterAdmin from "@/components/layoutAdmin/FooterAdmin";
 import HeaderAdmin from "@/components/layoutAdmin/HeaderAdmin";
 import SidebarAdmin from "@/components/layoutAdmin/SidebarAdmin";
 import ContentAdmin from "@/components/layoutAdmin/ContentAdmin";
+import { auth } from "@/auth";
 // todo: custom lại layout
-const AdminLayout = ({
+const AdminLayout = async ({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
+  const session = await auth();
+
   return (
     <Layout style={{ height: "100vh" }}>
       <SidebarAdmin />
       <Layout>
-        <HeaderAdmin />
+        <HeaderAdmin session={session} />
         <ContentAdmin>{children}</ContentAdmin>
         <FooterAdmin />
       </Layout>

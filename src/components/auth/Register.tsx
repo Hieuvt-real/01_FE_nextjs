@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import type { FormProps } from "antd";
-import { Button, Form, Input, Modal } from "antd";
+import { Button, Form, Input, notification } from "antd";
 import styled from "./style/register.module.scss";
-import ActivateAccount from "./ActivateAccount";
+
 import { useRouter } from "next/navigation";
+import axios from "axios";
+import type { AxiosError } from "axios";
 
 type FieldType = {
   username?: string;
@@ -14,12 +16,28 @@ type FieldType = {
 };
 
 const Register = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
 
-  const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
-    console.log("Success:", values);
-    setIsModalOpen(true);
+  const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
+    try {
+      const { data, status } = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
+        {
+          email: values.username,
+          password: values.password,
+          name: values.name,
+        }
+      );
+
+      if (data && (status === 201 || status === 200)) {
+        router.push(`verify/${data?.data?._id}`);
+      }
+    } catch (error: AxiosError<unknown, unknown>) {
+      notification.error({
+        message: "Register error",
+        description: error?.response?.data?.message,
+      });
+    }
   };
 
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
@@ -28,9 +46,6 @@ const Register = () => {
     console.log("Failed:", errorInfo);
   };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
   return (
     <div className={styled["register-container"]}>
       <p className={styled.title}>Register</p>
@@ -59,11 +74,7 @@ const Register = () => {
           <Input.Password />
         </Form.Item>
 
-        <Form.Item<FieldType>
-          label="Name"
-          name="name"
-          rules={[{ required: true, message: "Please input your name!" }]}
-        >
+        <Form.Item<FieldType> label="Name" name="name">
           <Input />
         </Form.Item>
 
@@ -83,17 +94,6 @@ const Register = () => {
           to login
         </p>
       </Form>
-
-      <Modal
-        title={null}
-        open={isModalOpen}
-        onCancel={handleModalClose}
-        footer={null}
-        centered
-        width={400}
-      >
-        <ActivateAccount onClose={handleModalClose} />
-      </Modal>
     </div>
   );
 };

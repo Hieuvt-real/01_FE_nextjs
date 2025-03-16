@@ -27,34 +27,49 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // You can specify which fields should be submitted, by adding keys to the `credentials` object.
       // e.g. domain, username, password, 2FA token, etc.
       credentials: {
-        email: {},
+        username: {},
         password: {},
       },
       authorize: async (credentials) => {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}auth/login`,
-          {
-            username: credentials.email,
-            password: credentials.password,
-          }
-        );
-        const user = response.data;
-        console.log("checkusser", response.status);
+        try {
+          const response = await axios.post(
+            `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+            {
+              username: credentials.username,
+              password: credentials.password,
+            }
+          );
+          const user = response.data;
 
-        if (+response.status === 200 || +response.status === 201) {
-          // return user object with their profile data
-          return {
-            _id: user.user._id,
-            name: user.user.name,
-            email: user.user.email,
-            access_token: user.access_token,
-          };
-        } else if (+response.status === 401) {
-          throw new InvalidEmailPasswordError();
-        } else if (+response.status === 400) {
-          throw new InactiveAccountError();
-        } else {
-          throw new Error("Internal server error");
+          console.log("checkusser", response);
+          // Kiểm tra dữ liệu trả về từ API
+          if (user && user.data && user.data.user) {
+            return {
+              id: user.data.user._id, // Auth.js yêu cầu 'id'
+              name: user.data.user.name,
+              email: user.data.user.email,
+              access_token: user.data.access_token,
+            };
+          } else {
+            throw new InvalidEmailPasswordError();
+          }
+        } catch (error: any) {
+          console.error("API Error:", error.response?.data || error.message);
+          // Kiểm tra mã trạng thái từ lỗi của Axios
+          const status = error.response?.status;
+          if (status === 401) {
+            throw new InvalidEmailPasswordError(
+              error.response?.data?.message || "Invalid credentials"
+            );
+          } else if (status === 400) {
+            throw new InactiveAccountError(
+              error.response?.data?.message || "Account inactive"
+            );
+          } else {
+            throw new Error(
+              error.response?.data?.message || "Internal server error"
+            );
+          }
         }
       },
     }),
@@ -65,9 +80,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     jwt({ token, user }) {
       if (user) {
-        console.log(">>>>>>>>>>>>>>>>>user", user);
-
-        // User is available during sign-in
         (token as any).user = user as any;
       }
       return token;
@@ -75,6 +87,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     session({ session, token }) {
       (session as any).user = token.user;
       return session;
+    },
+    authorized: async ({ auth }) => {
+      return !!auth;
     },
   },
   secret: process.env.AUTH_SECRET, // Thêm secret để tránh lỗi khác

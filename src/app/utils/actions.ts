@@ -3,15 +3,15 @@
 
 import { signIn } from "@/auth";
 
-export async function authenticate(email: string, password: string) {
+export async function authenticate(username: string, password: string) {
   try {
     const r = await signIn("credentials", {
-      email,
+      username,
       password,
       //   callbackUrl: undefined,
       redirect: false,
     });
-    // console.log(">>>>> check r", r);
+    console.log(">>>>> check r", r);
 
     return r;
   } catch (error: any) {

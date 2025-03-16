@@ -1,37 +1,52 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import styles from "./style/activate.module.scss";
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input, message, notification } from "antd";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
-interface ActivateAccountProps {
-  onClose: () => void;
-}
+const ActivateAccount = ({ id }: { id: string }) => {
+  const router = useRouter();
+  const [form] = Form.useForm();
 
-const ActivateAccount = ({ onClose }: ActivateAccountProps) => {
-  const [inputCode, setinputCode] = useState("");
+  const handleSubmit = async (v: any) => {
+    const { code, _id } = v;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Giả lập gọi API kích hoạt thành công
-    alert("Kích hoạt thành công!");
-    onClose();
+    try {
+      const { status } = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/check-code`,
+        {
+          _id,
+          code,
+        }
+      );
+      if (status === 200 || status === 201) {
+        message.info("kích hoạt tài khoản thành công")
+        router.push("/auth/login");
+      }
+    } catch (error: any) {
+      notification.error({
+        message: "Verify error",
+        description: error?.response?.data?.message,
+      });
+    }
   };
   return (
     <div className={styles["activate-container"]}>
       <p className={styles["subtitle"]}>
-        Vui lòng nhập mã kích hoạt đã được gửi đến email của bạn.
+        Vui lòng nhập mã kích hoạt đã được gửi đến email của bạn
       </p>
-      <Form onFinish={handleSubmit} className={styles["code-form"]}>
-        <div className={styles["code-inputs"]}>
-          <Input
-            type="text"
-            value={inputCode}
-            onChange={(e) => setinputCode(e.target.value)}
-            className={styles["code"]}
-          />
-        </div>
+      <Form form={form} onFinish={handleSubmit} className={styles["code-form"]}>
+        <Form.Item name="_id" noStyle initialValue={id}>
+          <Input hidden />
+        </Form.Item>
+        <Form.Item name="code" noStyle>
+          <div className={styles["code-inputs"]}>
+            <Input className={styles["code"]} />
+          </div>
+        </Form.Item>
         <Button htmlType="submit" className={styles["activate-btn"]}>
           Xác nhận
         </Button>

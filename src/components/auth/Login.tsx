@@ -2,7 +2,7 @@
 
 import React from "react";
 import type { FormProps } from "antd";
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input, notification } from "antd";
 import styled from "./style/login.module.scss";
 import { authenticate } from "@/app/utils/actions";
 import { useRouter } from "next/navigation";
@@ -13,24 +13,31 @@ type FieldType = {
   remember?: string;
 };
 
-const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
-  console.log("Success:", values);
-  const { username: email, password } = values;
-  // trigger sign in
-  if (email && password) {
-    // console.log("process.env.BASE_URL", process.env.NEXT_PUBLIC_API_URL);
-
-    const res = await authenticate(email, password);
-    console.log(">>>>>> check res", res);
-  }
-};
-
 const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (errorInfo) => {
   console.log("Failed:", errorInfo);
 };
 
 const Login = () => {
   const router = useRouter();
+
+  const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
+    const { username, password } = values;
+    // trigger sign in
+    if (username && password) {
+      const res = await authenticate(username, password);
+      if (res?.error) {
+        notification.error({
+          message: "Error login",
+          description: res?.error,
+        });
+        if (res?.code === 2) {
+          router.push(`/auth/verify/${0}`);
+        }
+      } else {
+        router.push("/dashboard");
+      }
+    }
+  };
 
   return (
     <div className={styled["login-container"]}>
